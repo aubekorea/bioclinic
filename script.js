@@ -326,6 +326,32 @@ if(wellnessTabs.length&&wellnessVisual&&wellnessNextVisual){
     };
   };
   wellnessTabs.forEach((button,index)=>button.addEventListener('click',()=>rollWellnessTo(index,index>current?1:-1)));
+  let wheelDistance=0;
+  let wheelDirection=0;
+  let wheelLocked=false;
+  let lastWheelAt=0;
+  wellnessVisual.addEventListener('wheel',event=>{
+    if(event.ctrlKey||dragging)return;
+    const direction=Math.sign(event.deltaY);
+    if(!direction)return;
+    const next=current+direction;
+    if(next<0||next>=wellnessTabs.length){
+      wheelDistance=0;
+      return;
+    }
+    event.preventDefault();
+    if(animating||wheelLocked)return;
+    const now=performance.now();
+    if(direction!==wheelDirection||now-lastWheelAt>250)wheelDistance=0;
+    wheelDirection=direction;
+    lastWheelAt=now;
+    wheelDistance+=Math.abs(event.deltaY)*(event.deltaMode===1?16:event.deltaMode===2?window.innerHeight:1);
+    if(wheelDistance<40)return;
+    wheelDistance=0;
+    wheelLocked=true;
+    rollWellnessTo(next,direction>0?-1:1);
+    window.setTimeout(()=>{wheelLocked=false;},reduceMotion?450:900);
+  },{passive:false});
   wellnessVisual.addEventListener('pointerdown',event=>{
     if(animating)return;
     dragStartY=event.clientY;
