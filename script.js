@@ -1,4 +1,26 @@
 const slides=[...document.querySelectorAll('.hero-slide')];
+const mobileMenuToggle=document.querySelector('.mobile-menu-toggle');
+const primaryNavigation=document.querySelector('#primary-navigation');
+if(mobileMenuToggle&&primaryNavigation){
+  const setMobileMenuOpen=(open)=>{
+    document.querySelector('.header').classList.toggle('menu-open',open);
+    mobileMenuToggle.setAttribute('aria-expanded',String(open));
+    mobileMenuToggle.setAttribute('aria-label',open?'메뉴 닫기':'메뉴 열기');
+  };
+  mobileMenuToggle.addEventListener('click',()=>setMobileMenuOpen(mobileMenuToggle.getAttribute('aria-expanded')!=='true'));
+  primaryNavigation.addEventListener('click',(event)=>{
+    if(event.target.closest('a'))setMobileMenuOpen(false);
+  });
+  document.addEventListener('keydown',(event)=>{
+    if(event.key==='Escape')setMobileMenuOpen(false);
+  });
+  document.addEventListener('pointerdown',(event)=>{
+    if(!event.target.closest('.header'))setMobileMenuOpen(false);
+  });
+  window.matchMedia('(min-width:1051px)').addEventListener('change',(event)=>{
+    if(event.matches)setMobileMenuOpen(false);
+  });
+}
 const current=document.querySelector('.hero-current');
 const hero=document.querySelector('.hero');
 const heroProgress=document.querySelector('.hero-control span');
