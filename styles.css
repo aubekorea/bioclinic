@@ -418,6 +418,11 @@ body{color:#000}
 @media(max-width:1500px){.s10-process{width:100%;transform:none}.s10-row{gap:42px}.s10-row li:not(:last-child):after{right:-30px}}
 @media(max-width:900px){.s10-row{display:grid;grid-template-columns:repeat(2,205px);gap:22px}.s10-row-bottom{margin-top:22px}.s10-row li:after{display:none}}
 @media(max-width:520px){.s10-row{grid-template-columns:205px}.s10-row li{width:205px}}
+.s10-row li.is-active{background:#b9e4f6;color:#075a81;box-shadow:0 0 0 3px rgba(85,176,220,.35),0 0 28px rgba(85,176,220,.65)}
+.s10-row li.is-active:not(:last-child):after{border-left-color:#66b5dc;filter:drop-shadow(0 0 7px rgba(85,176,220,.7))}
+.s10-process.is-running .s10-row li.is-active{animation:s10-step-flash 1.4s steps(1,end) both}
+@keyframes s10-step-flash{0%,18%,38%{background:#d9d9d9;color:#000;box-shadow:none}9%,28%,50%,100%{background:#b9e4f6;color:#075a81;box-shadow:0 0 0 3px rgba(85,176,220,.35),0 0 28px rgba(85,176,220,.65)}}
+@media(prefers-reduced-motion:reduce){.s10-process.is-running .s10-row li.is-active{animation:none}}
 .s9-treatment-copy .s9-treatment-tabs li{font:500 20px/24px Pretendard,"Noto Sans KR",Arial,sans-serif}
 .s9-treatment-tabs button{padding:0;border:0;background:none;color:#8d8d8d;font:inherit;text-align:left;cursor:pointer;transition:color .25s ease,transform .25s ease}
 .s9-treatment-tabs button:hover,.s9-treatment-tabs button:focus-visible{color:#333;transform:translateX(5px)}

@@ -392,6 +392,41 @@ if(wellnessTabs.length&&wellnessVisual&&wellnessNextVisual){
   wellnessVisual.addEventListener('dragstart',event=>event.preventDefault());
 }
 
+const careProcess=document.querySelector('.s10-process');
+if(careProcess){
+  const steps=[...careProcess.querySelectorAll('.s10-row li')];
+  let activeStep=0;
+  let processTimer;
+  let processInView=false;
+  const lightStep=index=>{
+    activeStep=index;
+    steps.forEach((step,i)=>step.classList.toggle('is-active',i===index));
+  };
+  const updateProcessMotion=()=>{
+    if(processInView&&!document.hidden){
+      if(processTimer)return;
+      lightStep(0);
+      careProcess.classList.add('is-running');
+      processTimer=window.setInterval(()=>lightStep((activeStep+1)%steps.length),1400);
+    }else{
+      window.clearInterval(processTimer);
+      processTimer=undefined;
+      careProcess.classList.remove('is-running');
+    }
+  };
+  if(steps.length===7){
+    lightStep(0);
+    if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      const processObserver=new IntersectionObserver(entries=>{
+        processInView=entries[0].isIntersecting;
+        updateProcessMotion();
+      },{threshold:.1});
+      processObserver.observe(careProcess);
+      document.addEventListener('visibilitychange',updateProcessMotion);
+    }
+  }
+}
+
 const galleryButtons=[...document.querySelectorAll('.gallery-thumbs button')];
 galleryButtons.forEach((button)=>button.addEventListener('click',()=>{
   if(!galleryMain)return;
