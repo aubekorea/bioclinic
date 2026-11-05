@@ -258,7 +258,7 @@ body{color:#000}
 .s5-card-spine{left:0;top:0}
 .s5-card-spine>img{width:580px;height:344px;display:block;object-fit:cover}
 .s5-card-spine>.s5-spine-full{width:100%;height:100%;position:absolute;inset:0;visibility:hidden;opacity:0;object-fit:cover;transition:opacity .42s ease,visibility .42s}
-.s5-card-spine>div{width:580px;height:261px;padding:37px 64px 30px;position:absolute;left:0;bottom:0;background:linear-gradient(180deg,rgba(229,229,229,.6) -72.89%,rgba(255,255,255,.6) 100%)}
+.s5-card-spine>div{width:580px;height:261px;padding:37px 64px 30px;position:absolute;left:0;bottom:0;background:linear-gradient(180deg,rgba(189,189,189,.6) -72.89%,rgba(255,255,255,.6) 100%)}
 .s5-card-spine h3{margin:0;color:#000;font:600 26px/30px Pretendard,"Noto Sans KR",Arial,sans-serif}
 .s5-card-spine p{width:452px;margin:17px 0 0;color:#000;font:400 20px/26px Pretendard,"Noto Sans KR",Arial,sans-serif}
 .s5-card-joint{left:600px;top:42px}
