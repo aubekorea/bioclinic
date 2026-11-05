@@ -281,45 +281,49 @@ const wellnessTabs=[...document.querySelectorAll('.s9-treatment-tabs button')];
 const wellnessVisual=document.querySelector('.s9-treatment-visual');
 const wellnessNextVisual=document.querySelector('.s9-next-visual');
 if(wellnessTabs.length&&wellnessVisual&&wellnessNextVisual){
+  const currentSlide=wellnessVisual.querySelector('.s9-current-slide');
+  const incomingSlide=wellnessVisual.querySelector('.s9-incoming-slide');
   let current=0;
   let animating=false;
   let dragStartY=0;
   let dragOffset=0;
   let dragging=false;
+  let preparedDragTarget=-1;
   const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const setVisual=(visual,button,hidden=false)=>{
     const label=button.textContent.trim();
     const image=visual.querySelector('img');
-    image.src=button.dataset.image;
+    if(image.getAttribute('src')!==button.dataset.image)image.src=button.dataset.image;
     image.alt=hidden?'':label;
     visual.querySelector('figcaption').textContent=label;
   };
+  wellnessTabs.forEach(button=>{const image=new Image();image.src=button.dataset.image;});
   const prepareFollowing=index=>setVisual(wellnessNextVisual,wellnessTabs[(index+1)%wellnessTabs.length],true);
   const activateWellnessTab=index=>wellnessTabs.forEach((tab,i)=>{const selected=i===index;tab.classList.toggle('active',selected);tab.setAttribute('aria-selected',String(selected));});
   const rollWellnessTo=(index,direction=index>current?1:-1,startOffset=0)=>{
     const button=wellnessTabs[index];
     if(index===current||animating)return;
     activateWellnessTab(index);
-    setVisual(wellnessNextVisual,button,true);
-    if(reduceMotion||getComputedStyle(wellnessNextVisual).display==='none'){
-      setVisual(wellnessVisual,button);
+    setVisual(incomingSlide,button,true);
+    if(reduceMotion){
+      setVisual(currentSlide,button);
       current=index;
+      currentSlide.style.transform='';
+      incomingSlide.style.transform='';
       prepareFollowing(current);
       return;
     }
     animating=true;
-    const distance=wellnessNextVisual.offsetTop-wellnessVisual.offsetTop;
-    const endOffset=direction>0?-distance:distance;
-    const incomingStart=direction>0?startOffset:-2*distance+startOffset;
-    const incomingEnd=-distance;
-    const timing={duration:720,easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'};
-    const outgoingAnimation=wellnessVisual.animate([{transform:`translateY(${startOffset}px)`},{transform:`translateY(${endOffset}px)`}],timing);
-    const incomingAnimation=wellnessNextVisual.animate([{transform:`translateY(${incomingStart}px)`},{transform:`translateY(${incomingEnd}px)`}],timing);
+    const distance=wellnessVisual.clientHeight;
+    const incomingStart=direction>0?distance:-distance;
+    const timing={duration:560,easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'};
+    const outgoingAnimation=currentSlide.animate([{transform:`translateY(${startOffset}px)`},{transform:`translateY(${direction>0?-distance:distance}px)`}],timing);
+    const incomingAnimation=incomingSlide.animate([{transform:`translateY(${incomingStart+startOffset}px)`},{transform:'translateY(0)'}],timing);
     incomingAnimation.onfinish=()=>{
-      setVisual(wellnessVisual,button);
+      setVisual(currentSlide,button);
       current=index;
-      wellnessVisual.style.transform='';
-      wellnessNextVisual.style.transform='';
+      currentSlide.style.transform='';
+      incomingSlide.style.transform='';
       outgoingAnimation.cancel();
       incomingAnimation.cancel();
       prepareFollowing(current);
@@ -335,11 +339,6 @@ if(wellnessTabs.length&&wellnessVisual&&wellnessNextVisual){
     if(event.ctrlKey||dragging)return;
     const direction=Math.sign(event.deltaY);
     if(!direction)return;
-    const next=current+direction;
-    if(next<0||next>=wellnessTabs.length){
-      wheelDistance=0;
-      return;
-    }
     event.preventDefault();
     if(animating||wheelLocked)return;
     const now=performance.now();
@@ -350,26 +349,27 @@ if(wellnessTabs.length&&wellnessVisual&&wellnessNextVisual){
     if(wheelDistance<40)return;
     wheelDistance=0;
     wheelLocked=true;
-    rollWellnessTo(next,direction>0?-1:1);
-    window.setTimeout(()=>{wheelLocked=false;},reduceMotion?450:900);
+    rollWellnessTo((current+direction+wellnessTabs.length)%wellnessTabs.length,direction);
+    window.setTimeout(()=>{wheelLocked=false;},reduceMotion?300:650);
   },{passive:false});
   wellnessVisual.addEventListener('pointerdown',event=>{
-    if(animating)return;
+    if(animating||(event.pointerType==='mouse'&&event.button!==0))return;
     dragStartY=event.clientY;
     dragOffset=0;
     dragging=true;
+    preparedDragTarget=-1;
     wellnessVisual.classList.add('is-dragging');
     wellnessVisual.setPointerCapture?.(event.pointerId);
   });
   wellnessVisual.addEventListener('pointermove',event=>{
     if(!dragging)return;
-    dragOffset=Math.max(-190,Math.min(190,event.clientY-dragStartY));
+    const distance=wellnessVisual.clientHeight;
+    dragOffset=Math.max(-distance,Math.min(distance,event.clientY-dragStartY));
     const direction=dragOffset<=0?1:-1;
     const target=(current+direction+wellnessTabs.length)%wellnessTabs.length;
-    const distance=wellnessNextVisual.offsetTop-wellnessVisual.offsetTop;
-    setVisual(wellnessNextVisual,wellnessTabs[target],true);
-    wellnessVisual.style.transform=`translateY(${dragOffset}px)`;
-    wellnessNextVisual.style.transform=direction>0?`translateY(${dragOffset}px)`:`translateY(${-2*distance+dragOffset}px)`;
+    if(preparedDragTarget!==target){setVisual(incomingSlide,wellnessTabs[target],true);preparedDragTarget=target;}
+    currentSlide.style.transform=`translateY(${dragOffset}px)`;
+    incomingSlide.style.transform=`translateY(${(direction>0?distance:-distance)+dragOffset}px)`;
   });
   const finishWellnessDrag=event=>{
     if(!dragging)return;
@@ -381,9 +381,9 @@ if(wellnessTabs.length&&wellnessVisual&&wellnessNextVisual){
     if(Math.abs(offset)>=65){
       rollWellnessTo(target,direction,offset);
     }else{
-      const distance=wellnessNextVisual.offsetTop-wellnessVisual.offsetTop;
-      wellnessVisual.animate([{transform:`translateY(${offset}px)`},{transform:'translateY(0)'}],{duration:240,easing:'ease-out'}).onfinish=()=>wellnessVisual.style.transform='';
-      wellnessNextVisual.animate([{transform:direction>0?`translateY(${offset}px)`:`translateY(${-2*distance+offset}px)`},{transform:direction>0?'translateY(0)':`translateY(${-2*distance}px)`}],{duration:240,easing:'ease-out'}).onfinish=()=>{wellnessNextVisual.style.transform='';prepareFollowing(current);};
+      const distance=wellnessVisual.clientHeight;
+      currentSlide.animate([{transform:`translateY(${offset}px)`},{transform:'translateY(0)'}],{duration:240,easing:'ease-out'}).onfinish=()=>currentSlide.style.transform='';
+      incomingSlide.animate([{transform:`translateY(${(direction>0?distance:-distance)+offset}px)`},{transform:`translateY(${direction>0?distance:-distance}px)`}],{duration:240,easing:'ease-out'}).onfinish=()=>incomingSlide.style.transform='';
     }
     if(wellnessVisual.hasPointerCapture?.(event.pointerId))wellnessVisual.releasePointerCapture(event.pointerId);
   };
