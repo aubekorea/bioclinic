@@ -497,7 +497,7 @@ body{color:#000}
   .section4-nav{top:238px;width:44px;height:44px}
   .section4-prev{left:10px}.section4-next{right:10px}
 }
-@media(max-width:380px){.section4-image,.section4-stage .section4-copy{height:540px}.section4-nav{top:248px}}
+@media(max-width:380px){.section4-image,.section4-stage .section4-copy,.section4-stage[data-mode="jelly"] .section4-copy{height:540px}.section4-nav{top:150px}}
 @media(prefers-reduced-motion:reduce){.section4-image::before,.section4-image::after,.section4-switch::before,.section4-switch::after{transition:none}}
 
 /* Mobile navigation and section sizing */
