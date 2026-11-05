@@ -138,49 +138,16 @@ const galleryMain=document.querySelector('.gallery-main img');
 const section4Stage=document.querySelector('.section4-stage');
 const section4Switch=document.querySelector('.section4-switch');
 if(section4Stage&&section4Switch){
-  let section4Transitioning=false;
-  const reduceSection4Motion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const setSection4Mode=()=>{
     const jelly=section4Stage.dataset.mode==='jelly';
     section4Stage.dataset.mode=jelly?'blood':'jelly';
     section4Switch.querySelector('strong').textContent=jelly?"와튼젤리 (Wharton's Jelly)":'자가 혈액 세포 치료';
   };
-  const toggleSection4=async(direction=1)=>{
-    if(section4Transitioning)return;
-    if(reduceSection4Motion){setSection4Mode();return;}
-    section4Transitioning=true;
-    section4Stage.classList.remove('is-settling');
-    section4Stage.classList.add('is-switching');
-    const frontImage=section4Stage.querySelector('.section4-image');
-    const frontDetails=[...section4Stage.querySelectorAll('.section4-copy,.section4-panel')].filter(element=>getComputedStyle(element).display!=='none');
-    const distance=direction*150;
-    const timing={duration:680,easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'};
-    const frontAnimation=frontImage.animate([
-      {transform:'translate3d(0,0,0) scale(1)',opacity:1},
-      {transform:`translate3d(${-distance}px,28px,0) scale(.965)`,opacity:.08}
-    ],timing);
-    const detailAnimations=frontDetails.map(element=>element.animate([
-      {transform:'translateX(0)',opacity:1},
-      {transform:`translateX(${-distance*.72}px)`,opacity:0}
-    ],{...timing,duration:500}));
-    const rearAnimation=section4Switch.animate([
-      {transform:`translate3d(${distance*.16}px,0,0) scale(.965)`,filter:'blur(1.5px)',opacity:.82},
-      {transform:'translate3d(0,-41.5px,0) scale(1)',filter:'blur(0)',opacity:1}
-    ],timing);
-    await Promise.all([frontAnimation,rearAnimation,...detailAnimations].map(animation=>animation.finished));
+  const toggleSection4=()=>{
     setSection4Mode();
-    [frontAnimation,rearAnimation,...detailAnimations].forEach(animation=>animation.cancel());
-    const incomingDetails=[...section4Stage.querySelectorAll('.section4-copy,.section4-panel')].filter(element=>getComputedStyle(element).display!=='none');
-    const revealAnimations=incomingDetails.map(element=>element.animate([
-      {opacity:0,transform:`translateX(${direction*24}px)`},
-      {opacity:1,transform:'translateX(0)'}
-    ],{duration:260,easing:'ease-out'}));
-    await Promise.all(revealAnimations.map(animation=>animation.finished));
-    section4Stage.classList.remove('is-switching');
-    section4Transitioning=false;
   };
-  section4Switch.addEventListener('click',()=>toggleSection4(1));
-  section4Stage.querySelectorAll('.section4-nav').forEach(button=>button.addEventListener('click',()=>toggleSection4(button.classList.contains('section4-prev')?-1:1)));
+  section4Switch.addEventListener('click',toggleSection4);
+  section4Stage.querySelectorAll('.section4-nav').forEach(button=>button.addEventListener('click',toggleSection4));
   let dragStartX=0;
   let dragX=0;
   let dragging=false;
@@ -191,12 +158,12 @@ if(section4Stage&&section4Switch){
     section4Stage.classList.remove('is-dragging');
     section4Stage.classList.add('is-settling');
     section4Stage.style.setProperty('--section4-drag-x','0px');
-    if(Math.abs(dragX)>=70)toggleSection4(dragX<0?1:-1);
+    if(Math.abs(dragX)>=70)toggleSection4();
     window.setTimeout(()=>section4Stage.classList.remove('is-settling'),360);
     if(section4Stage.hasPointerCapture?.(event.pointerId))section4Stage.releasePointerCapture(event.pointerId);
   };
   section4Stage.addEventListener('pointerdown',event=>{
-    if(event.target.closest('.section4-nav'))return;
+    if(event.target.closest('.section4-nav,.section4-switch'))return;
     dragStartX=event.clientX;
     dragX=0;
     dragging=true;

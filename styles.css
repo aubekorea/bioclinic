@@ -463,6 +463,43 @@ body{color:#000}
 .section4-copy h3,.section4-copy p,.section4-switch small,.section4-switch strong{color:#fff}
 .section4-copy h3,.section4-switch strong{text-shadow:0 2px 10px rgba(0,0,0,.35)}
 
+/* Keep both card images rendered so changing cards does not wait for a background swap. */
+.section4-image,.section4-switch{overflow:hidden;background-image:none!important;transition:left .22s ease}
+.section4-image::before,.section4-image::after,.section4-switch::before,.section4-switch::after{content:"";position:absolute;inset:0;background-position:center;background-size:cover;transition:opacity .2s ease;pointer-events:none}
+.section4-image::before,.section4-switch::after{background-image:linear-gradient(0deg,rgba(0,0,0,.82),rgba(0,0,0,.06) 82%),url('assets/regenerative-blood.webp')}
+.section4-image::after,.section4-switch::before{background-image:linear-gradient(0deg,rgba(0,0,0,.82),rgba(0,0,0,.06) 82%),url('assets/regenerative-wharton.webp')}
+.section4-image::after,.section4-switch::after,.section4-stage[data-mode="jelly"] .section4-image::before,.section4-stage[data-mode="jelly"] .section4-switch::before{opacity:0}
+.section4-stage[data-mode="jelly"] .section4-image::after,.section4-stage[data-mode="jelly"] .section4-switch::after{opacity:1}
+.section4-switch small,.section4-switch strong{position:relative;z-index:1}
+.section4-panel{display:flex;align-items:center;padding:48px 54px 42px}
+.section4-stage .jelly-panel{display:none}
+.section4-stage[data-mode="jelly"] .jelly-panel{display:flex}
+.section4-panel ol{width:100%;display:grid;gap:24px}
+.section4-panel li{width:100%;height:auto;min-height:0;grid-template-columns:28px minmax(0,1fr);column-gap:12px;margin:0;padding:0 0 20px}
+.section4-panel li:last-child{padding-bottom:0;border-bottom:0}
+.section4-panel li p{margin-top:9px;line-height:1.5}
+.section4-nav{display:flex;align-items:center;justify-content:center;font-size:0;line-height:0}
+.section4-nav::before{content:"";width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg)}
+.section4-prev::before{transform:rotate(135deg)}
+@media(max-width:1200px){
+  .section4-stage{height:auto;display:block;margin-top:52px}
+  .section4-image{height:520px;border-radius:24px}
+  .section4-stage .section4-copy,.section4-stage[data-mode="jelly"] .section4-copy{width:100%;height:520px;position:absolute;left:0;top:0;padding:28px 26px 30px;flex-direction:column;justify-content:flex-end;background:none;pointer-events:none}
+  .section4-stage .blood-copy,.section4-stage[data-mode="jelly"] .jelly-copy{display:flex}
+  .section4-stage .jelly-copy,.section4-stage[data-mode="jelly"] .blood-copy{display:none}
+  .section4-copy h3{font-size:22px;line-height:1.25}
+  .section4-copy p{margin-top:14px;font-size:15px;line-height:1.5}
+  .section4-stage .section4-panel{width:100%;height:auto;position:relative;left:auto;right:auto;top:auto;margin-top:18px;padding:28px 24px;display:block;border-radius:24px;background:#f7f8f8}
+  .section4-stage .jelly-panel,.section4-stage[data-mode="jelly"] .blood-panel{display:none}
+  .section4-stage[data-mode="jelly"] .jelly-panel{display:block}
+  .section4-panel ol{gap:20px}
+  .section4-panel li{padding-bottom:20px}
+  .section4-nav{top:238px;width:44px;height:44px}
+  .section4-prev{left:10px}.section4-next{right:10px}
+}
+@media(max-width:380px){.section4-image,.section4-stage .section4-copy{height:540px}.section4-nav{top:248px}}
+@media(prefers-reduced-motion:reduce){.section4-image::before,.section4-image::after,.section4-switch::before,.section4-switch::after{transition:none}}
+
 /* Mobile navigation and section sizing */
 .mobile-menu-toggle{display:none}
 main section[id]{scroll-margin-top:90px}
