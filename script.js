@@ -275,6 +275,40 @@ if(autonomicMotionSection){
     });
   },{threshold:.24});
   autonomicObserver.observe(autonomicMotionSection);
+
+  const symptomWheel=autonomicMotionSection.querySelector('.s7-symptom-wheel');
+  const wheelSegments=[...symptomWheel.querySelectorAll('.s7-wheel-segment')];
+  const wheelLabels=wheelSegments.map(segment=>symptomWheel.querySelector(`.s7-symptom-${segment.dataset.symptom}`));
+  let activeWheelSegment=0;
+  let wheelTimer;
+  let wheelInView=false;
+  const lightWheelSegment=index=>{
+    activeWheelSegment=index;
+    wheelSegments.forEach((segment,i)=>{
+      const active=i===index;
+      segment.classList.toggle('is-active',active);
+      wheelLabels[i]?.classList.toggle('is-active',active);
+    });
+  };
+  const updateWheelMotion=()=>{
+    if(wheelInView&&!document.hidden){
+      if(!wheelTimer)wheelTimer=window.setInterval(()=>lightWheelSegment((activeWheelSegment+1)%wheelSegments.length),1050);
+    }else{
+      window.clearInterval(wheelTimer);
+      wheelTimer=undefined;
+    }
+  };
+  if(wheelSegments.length===7){
+    lightWheelSegment(0);
+    if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      const wheelObserver=new IntersectionObserver(entries=>{
+        wheelInView=entries[0].isIntersecting;
+        updateWheelMotion();
+      },{threshold:.25});
+      wheelObserver.observe(symptomWheel);
+      document.addEventListener('visibilitychange',updateWheelMotion);
+    }
+  }
 }
 const wellnessTabs=[...document.querySelectorAll('.s9-treatment-tabs button')];
 const wellnessVisual=document.querySelector('.s9-treatment-visual');
