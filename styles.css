@@ -536,3 +536,24 @@ main section[id]{scroll-margin-top:90px}
   .section2-title h2,.location-heading h2{font-size:clamp(30px,8.5vw,38px)}
   main section[id]{scroll-margin-top:70px}
 }
+
+/* Let the care process grow with its mobile layout instead of clipping its steps. */
+@media(max-width:900px){
+  .s10-care-principles{height:auto;overflow:visible}
+  .s10-inner{height:auto}
+  .s10-heading{height:auto}
+  .s10-process{width:100%;height:auto;position:static;transform:none}
+}
+@media(max-width:600px){
+  main>section{text-align:center}
+  .location-heading{text-align:center}
+  .location-heading h2{font-size:clamp(25px,7.3vw,30px);line-height:1.35}
+  .location-heading h2 span{display:block}
+  .s10-process{margin:44px auto 0}
+  .s10-row{grid-template-columns:minmax(0,300px);gap:34px;justify-content:center}
+  .s10-row-bottom{width:100%;margin:34px 0 0}
+  .s10-row li{width:100%;max-width:none;height:112px;min-height:112px;flex-basis:auto;font-size:19px;line-height:1.35}
+  .s10-process .s10-row li:not(:last-child)::after,
+  .s10-process .s10-row-top li:last-child::after{content:"";display:block;width:0;height:0;position:absolute;left:50%;right:auto;top:auto;bottom:-25px;transform:translateX(-50%);border:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:13px solid #b5b5b5}
+  .s10-process .s10-row li.is-active::after{border-left-color:transparent;border-right-color:transparent;border-top-color:#66b5dc}
+}
